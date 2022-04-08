@@ -5,6 +5,7 @@ RefCard for Ansible usage.
 
 Written by Germain LEFEBVRE on December 2018 for Ansible v2.7 usage.
 
+Update by Nicolas Mercier on April 2022 for Ansible v2.12 usage.
 
 **Table of Contents**
 1. [Context](#context)
@@ -20,6 +21,7 @@ Written by Germain LEFEBVRE on December 2018 for Ansible v2.7 usage.
 1. [Ansible Roles](#ansible-roles)
 1. [Ansible Modules](#ansible-modules)
 1. [Ansible Vault](#ansible-vault)
+1. [Ansible Galaxy](#ansible-galaxy)
 
 
 
@@ -33,7 +35,7 @@ Operating System distribution and version:
 cat /etc/redhat-release
 ```
 ```
-CentOS Linux release 7.5.1804 (Core)
+Rocky Linux release 8.5 (Green Obsidian)
 ```
 
 Python version:
@@ -41,7 +43,7 @@ Python version:
 python --version
 ```
 ```
-Python 2.7.5
+Python 3.8.8
 ```
 
 Ansible version:
@@ -49,17 +51,20 @@ Ansible version:
 ansible --version
 ```
 ```
-ansible 2.7.1
+ansible [core 2.12.1]
   config file = /etc/ansible/ansible.cfg
-  configured module search path = [u'/home/ansible/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
-  ansible python module location = /usr/lib/python2.7/site-packages/ansible
-  executable location = /bin/ansible
-  python version = 2.7.5 (default, Apr 11 2018, 07:36:10) [GCC 4.8.5 20150623 (Red Hat 4.8.5-28)]
+  configured module search path = ['/home/ansible/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/local/lib/python3.8/site-packages/ansible
+  ansible collection location = /home/ansible/.ansible/collections:/usr/share/ansible/collections
+  executable location = /usr/local/bin/ansible
+  python version = 3.8.8 (default, Nov  9 2021, 13:31:34) [GCC 8.5.0 20210514 (Red Hat 8.5.0-3)]
+  jinja version = 3.0.3
+  libyaml = True
 ```
 
 
 ## Upgrade your Ansible version
-Ansible give their Roadmap for v2.7 : [https://docs.ansible.com/ansible/2.7/roadmap/ROADMAP_2_7.html](https://docs.ansible.com/ansible/2.7/roadmap/ROADMAP_2_7.html)
+Ansible give their Roadmap for v2.7 : [https://docs.ansible.com/ansible/devel/roadmap/ROADMAP_2_12.html](https://docs.ansible.com/ansible/devel/roadmap/ROADMAP_2_12.html)
 
 
 Ansible provides porting guides to help you keeping up-to-date:
@@ -69,6 +74,7 @@ Ansible provides porting guides to help you keeping up-to-date:
 * [Ansible 2.5 Porting Guide](https://docs.ansible.com/ansible/2.7/porting_guides/porting_guide_2.5.html)
 * [Ansible 2.6 Porting Guide](https://docs.ansible.com/ansible/2.7/porting_guides/porting_guide_2.6.html)
 * [Ansible 2.7 Porting Guide](https://docs.ansible.com/ansible/2.7/porting_guides/porting_guide_2.7.html)
+* [Ansible 2.10 Porting Guide](https://docs.ansible.com/ansible/2.10/porting_guides/porting_guide_2.10.html)
 
 ## Ansible Definitions
 ### Ansible Facts
@@ -86,6 +92,9 @@ The Tasks are the actions launched on remote Hosts. Tasks are written in YAML la
 ### Ansible Variables
 The Variables are the way for Ansible to pass custom values in tasks (and more over).
 
+### Ansible Plays
+Plays are sequences of actions, with tasks and inventories. They make it possible to apply a list of tasks on a set of servers.
+
 ### Ansible Playbooks
 The Playbooks are the gathering of tasks and hosts. So a Playbook defines a list of tasks to perform on remote servers.
 
@@ -101,6 +110,7 @@ Modules are scripts written in Python and making uniform actions possible in giv
 
 ## Ansible Configuration
 Configuration can be made and used in a file which will be searched for in the following order:
+* environments variables
 * ansible.cfg (in the current directory)
 * ~/.ansible.cfg (in the home directory)
 * /etc/ansible/ansible.cfg
@@ -116,7 +126,11 @@ ansible localhost -m debug -a 'myVar'
 ansible localhost -m shell -a 'uptime'
 ansible all -i inventories/servers -m ping
 ```
-
+It is also possible to attach them to inventories.
+```
+ansible all -i inventories/hosts -m debug -a 'myVar'
+ansible redhat -i inventories/hosts -m shell -a 'uptime'
+```
 ## Ansible Inventories
 Ansible Inventories make possible to gather servers in a single file to run commands on all these hosts. Inventories are usually organized by environments (a file by env) to let the group_vars operate on tasks and roles.
 
@@ -191,6 +205,15 @@ Task definition :
 
 ## Ansible Playbooks
 A playbook is the gathering between hosts where will be applied tasks.
+It is a multi-purpose, reusable and simple configuration management and deployment system.
+
+Playbooks can:
+
+  - Declaring configurations
+
+  - Orchestrate the steps of any manual process ordered across multiple machine sets in a defined order
+
+  - start tasks synchronously or asynchronously
 
 **Install package on RHEL servers**
 ```yaml
@@ -324,6 +347,8 @@ A sufficient list of attributes for Ansible Play when running a playbook:
 
 ## Ansible Roles
 ### Structure of a role
+An Ansible role has a defined directory structure with eight main standard directories. You must include at least one of these directories in each role. You can omit all directories that the role does not use.
+
 Role directories strucutre:
 ```
 roles/
@@ -612,3 +637,10 @@ You can also provide multiple vault resolvers to roll on multiple environments. 
 ansible-playbook --vault-id dev@dev-password --vault-id prod@prompt site.yml
 ```
 
+## Ansible Galaxy
+
+Ansible Galaxy is a free site to search, download, evaluate and review all kinds of Ansible roles developed by the community and can be a great way to start your automation projects. It can also be used to create the "skeleton" of a role.
+
+```
+ansible-galaxy init my_name_role
+````
